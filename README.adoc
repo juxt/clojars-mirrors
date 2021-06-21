@@ -1,0 +1,62 @@
+= clojars-mirrors
+
+This repo is to mirror certain libraries on Clojars over to Maven Central, predominantly so that Crux itself can be hosted on Central and used by non-Clojure people.
+
+* Mirrors here use the `pro.juxt.clojars-mirrors` Maven group, so that it's obvious that our mirror isn't the canonical release.
+* Let's keep the mirrors in this repo - they may be useful beyond an individual project.
+* These mirrors use a small `project.clj` that uses https://github.com/benedekfazekas/mranderson[mranderson] to rename all of the namespaces and classes in the project and its transitive dependencies - this is so that if someone does happen to have both the mirror and the original in their project at different versions, the namespaces won't clash.
+
+== Re-deploying a mirrored library:
+
+* Update both the version of your dependency and the version of your mirror.
+  To test it out, you may want to set your mirror to a `SNAPSHOT` version first.
+* `./bin/build.sh <jar|install|deploy> <dir>`
+  * If you're deploying a `SNAPSHOT`, you're done - you may need to add
+  * If it's a stable release, you'll need to head to the https://oss.sonatype.org[Sonatype UI], 'staging repositories' to 'close' (a verification step) and then 'release' your mirror.
+    It then takes some time (usually minutes, occasionally hours if they're having a bad day) for the release library on OSSRH to be sync'd to https://repo1.maven.org.
+* You'll need to update the `:require`d namespaces in your projects to the new version.
+
+== Creating a new mirrored library:
+
+* To create a new mirrored library, `./bin/create.sh <groupId> <artifactId> <version>` to create a template `project.clj`, then follow the instructions within.
++
+When you update the copied `project.clj`, you'll want to exclude any transitive dependencies from the library that are already present on Maven Central, to minimise the amount of copied namespaces (and hence the JAR size).
+Most (all?) of `org.clojure` is already, for example, and obviously any underlying Java libraries.
+Include these as dependencies of your mirror.
+* We use `juxt.clojars-mirrors` as a namespace prefix; `mranderson` then adds on the name of the project, the version, and finally the original namespace - e.g. `taoensso.nippy` version 3.1.1's namespaces move to `juxt.clojars-mirrors.nippy.v3v1v1.taoensso.nippy`.
++
+Consider what this might mean for namespaced keywords - particularly if those keywords are serialised - if you must preserve the original namespaced keys (if they're serialised, say) it may be preferable to fork the library instead.
+
+== New JUXT users:
+
+* You'll need access to push to the `pro.juxt` group on Sonatype OSS Repository Hosting (OSSRH), https://oss.sonatype.org.
+  Create an account on the OSSRH JIRA (yes, really), and create a ticket like https://issues.sonatype.org/browse/OSSRH-69695[this one] requesting access to the `pro.juxt` group.
+  You'll need someone already on the group to vouch for you.
+  Instructions https://central.sonatype.org/publish/publish-guide/[here].
+* Use those same JIRA credentials to log in to https://oss.sonatype.org.
++
+Once you're there, you'll need to create an access token.
+Head to your profile (top right menu).
+In the 'Summary' dropdown, choose 'access token' (yes, the UI is weird), and 'access user token' - pop this somewhere safe.
+You'll want this in `~/.lein/credentials.clj.gpg` for Lein, `~/.gradle/gradle.properties` for Gradle, `~/.m2/settings.xml` for vanilla Maven (Maven not required in JUXT, AFAIK, but here's where they go if you do)
++
+[source,clojure]
+----
+{#"https://oss\.sonatype\.org/.*"
+ {:username "..."
+  :password "..."}}
+----
++
+[source,properties]
+----
+ossrhUsername=...
+ossrhPassword=...
+----
+* Create yourself a GPG key, and upload it to a public key server.
+  Instructions https://central.sonatype.org/publish/requirements/gpg/[here].
+
+== New Maven groupId (rare)
+
+Bear in mind that anyone with permissions to `pro.juxt` can automatically publish to any sub-group (`pro.juxt.crux`) - this should only be required if we'd like to publish under a different top-level domain (TLD).
+
+* Instructions https://central.sonatype.org/publish/[here].
