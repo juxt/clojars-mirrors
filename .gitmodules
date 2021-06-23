@@ -1,0 +1,12 @@
+[submodule "ztellman/riddley"]
+	path = ztellman/riddley
+	url = git@github.com:juxt/riddley
+	branch = clojars-mirror
+[submodule "ztellman/clj-tuple"]
+	path = ztellman/clj-tuple
+	url = git@github.com:juxt/clj-tuple
+	branch = clojars-mirror
+[submodule "clj-commons/potemkin"]
+	path = clj-commons/potemkin
+	url = git@github.com:juxt/potemkin
+	branch = clojars-mirror

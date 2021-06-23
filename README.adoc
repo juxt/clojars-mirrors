@@ -5,6 +5,10 @@ This repo is to mirror certain libraries on Clojars over to Maven Central, predo
 * Mirrors here use the `pro.juxt.clojars-mirrors` Maven group, so that it's obvious that our mirror isn't the canonical release.
 * Let's keep the mirrors in this repo - they may be useful beyond an individual project.
 * These mirrors use a small `project.clj` that uses https://github.com/benedekfazekas/mranderson[mranderson] to rename all of the namespaces and classes in the project and its transitive dependencies - this is so that if someone does happen to have both the mirror and the original in their project at different versions, the namespaces won't clash.
+* Exceptions to the rule: `potemkin`, `clj-tuple` and `riddley` - these are forked as submodules and released directly, due to it being a pain to get `mranderson` to handle them correctly.
+  See https://github.com/juxt/crux/pull/1543 for more details.
+  This does mean that the class/namespace names may clash - at the moment this seems like a reasonable risk given the unlikelihood of them being updated again.
+  If they do, and you do have a namespace clash, you _should_ be able to exclude the JUXT mirror artifact and everything still work.
 
 == Re-deploying a mirrored library:
 
