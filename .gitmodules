@@ -10,3 +10,6 @@
 	path = clj-commons/potemkin
 	url = git@github.com:juxt/potemkin
 	branch = clojars-mirror
+[submodule "weavejester/integrant"]
+	path = weavejester/integrant
+	url = git@github.com:juxt/integrant
